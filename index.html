@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" class="loading">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simon Sign</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="./src/assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./src/assets/img/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./src/assets/img/favicon/favicon-16x16.png">
+  <link rel="manifest" href="./src/assets/img/favicon/site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="src/css/reset.css">
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+
+<body>
+  <div class="hidden display-loading">
+    <video id="loading-load" width="100" height="100" autoplay muted>
+      <source src="./src/assets/vid/loading.mp4" type="video/mp4">
+    </video>
+    <p>Loading</p>
+  </div>
+  <div class="hidden display-intro">
+    <div class="strips"></div>
+    <div class="container">
+      <h1 class="h1">Simon Sign</h1>
+      <img src="./src/assets/img/Logo.svg" alt="Logo">
+      <div class="buttons">
+        <button class="primary-button" id="home-start">Play</button>
+        <button class="secondary-button" id="create">Create Model</button>
+      </div>
+    </div>
+    <div class="strips"></div>
+  </div>
+  <div class="hidden display-info">
+    <h2 class="how-to-play">HOW TO PLAY</h2>
+    <div class="info-container">
+      <dt><img src="./src/assets/img/Brain.svg" alt="Brain"></dt>
+      <dd><span class="bold">Memorize</span> the shown signs correctly</dd>
+      <dt><img src="./src/assets/img/Hand-Info.svg" alt="Hand-Info"></dt>
+      <dd>Every <span class="bold">3 seconds</span>, you need to <span class="bold">guess</span> the next sign by
+        showing it on the camera.</dd>
+      <dt><img src="./src/assets/img/Trophy.svg" alt="Trophy"></dt>
+      <dd>Guess the most signs and get the <span class="bold">best</span> score.</dd>
+    </div>
+    <div class="buttons">
+      <button class="secondary-button" id="info-back">&lt; Back</button>
+      <button class="primary-button" id="start">Got it!</button>
+    </div>
+  </div>
+  <div class="hidden display-sampling display-game">
+    <div class="sampling-and-game-container">
+      <div class="strips strip--left"></div>
+      <div class="hidden display-sampling sampling-top">
+        <h2>Train</h2>
+        <div class="buttons">
+          <button class="secondary-button" id="sampling-home">Home</button>
+          <button class="primary-button" id="train">Train & Play</button>
+          <button class="secondary-button" id="load">Load pretrained</button>
+        </div>
+      </div>
+      <div class="hidden display-game game-top">
+        <h2 class="round-counter">Round 3</h2>
+        <div class="progress-bar">
+        </div>
+      </div>
+      <div class="cam">
+        <canvas id="canvas" class="strips-border hidden display-sampling display-game"></canvas>
+        <div class="hidden display-game cam__ontop">
+          <img class="cam__image" src="./src/assets/img/Get-Ready-To-Memorize.svg" alt="Memorize Sign">
+        </div>
+      </div>
+      <div class="hidden display-sampling sampling-bottom ">
+        <div>
+          <button class="primary-button" id="flat-hand">Flat Hand</button>
+          <button class="primary-button" id="peace">Peace</button>
+          <button class="primary-button" id="thumbs-up">Thumbs Up</button>
+        </div>
+        <p class="error-message"></p>
+      </div>
+      <div class="hidden display-game game-bottom">
+        <div class="guess">
+          <p class="guess__title">Shown Sign</p>
+          <div class="answer">
+            <img class="answer-img" src="./src/assets/img/None-Game.svg" alt="Signt Sign">
+            <p id="results">Non Shown</p>
+          </div>
+        </div>
+        <div class="guess-timer">
+          <p class="guess-timer__title">Guess In</p>
+          <div>
+            <p class="count-down">3</p>
+          </div>
+        </div>
+      </div>
+      <div class="strips strip--right"></div>
+    </div>
+  </div>
+  <div class="hidden display-game-over game-over">
+    <h2 class="game-over__title">Game Over</h2>
+    <div class="wrong-sign">
+      <h3 class="wrong-sign__title">Your Answer</h3>
+      <img class="wrong-sign__image" src="./src/assets/img/Peace-Game-Over.svg" alt="Wrong Sign">
+      <p class="wrong-sign__name">Peace</p>
+    </div>
+    <div class="game-over__mid">
+      <div class="game-over__bar"></div>
+      <div class="game-over__score">
+        <p class="game-over__digit">03</p>
+        <p class="game-over__text">score</p>
+      </div>
+      <div class="game-over__buttons">
+        <button class="primary-button" id="play-again">Play Again</button>
+        <button class="secondary-button" id="save">Save Model</button>
+        <button class="secondary-button" id="game-over-home">Home</button>
+      </div>
+    </div>
+    <div class="right-sign">
+      <h3 class="right-sign__title">Right Answer</h3>
+      <img class="right-sign__image" src="./src/assets/img/Hand-Game-Over.svg" alt="Right Sign">
+      <p class="right-sign__name">Flat Hand</p>
+    </div>
+  </div>
+  <h2 id="state"></h2>
+  <div class="hidden display-training">
+    <video id="train-load" width="100" height="100" autoplay muted>
+      <source src="./src/assets/vid/loading.mp4" type="video/mp4">
+    </video>
+    <p>Training, Get Ready!</p>
+    <div class="hidden" id="training"></div>
+  </div>
+  <script src="https://unpkg.com/ml5@1.0.2/dist/ml5.min.js"></script>
+  <script src="./src/js/script.js"></script>
+</body>
+
+</html>
