@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simon Sign</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="./src/assets/img/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="./src/assets/img/favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="./src/assets/img/favicon/favicon-16x16.png">
-  <link rel="manifest" href="./src/assets/img/favicon/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/favicon/site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -59,9 +59,8 @@
       <div class="hidden display-sampling sampling-top">
         <h2>Train</h2>
         <div class="buttons">
-          <button class="secondary-button" id="sampling-home">Home</button>
+          <button class="secondary-button" id="sampling-home">&lt; Back</button>
           <button class="primary-button" id="train">Train & Play</button>
-          <button class="secondary-button" id="load">Load pretrained</button>
         </div>
       </div>
       <div class="hidden display-game game-top">
@@ -135,7 +134,7 @@
     <div class="hidden" id="training"></div>
   </div>
   <script src="https://unpkg.com/ml5@1.0.2/dist/ml5.min.js"></script>
-  <script src="./src/js/script.js"></script>
+  <script type="module" src="/src/js/script.js"></script>
 </body>
 
 </html>

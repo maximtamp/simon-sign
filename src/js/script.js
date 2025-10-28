@@ -1,3 +1,29 @@
+import getReadyImg from '../assets/img/Get-Ready-To-Memorize.svg';
+import flatHandMemorizeImg from '../assets/img/Flat-Hand-Memorize.svg';
+import peaceMemorizeImg from '../assets/img/Peace-Memorize.svg';
+import thumbsUpMemorizeImg from '../assets/img/Thumbs-Up-Memorize.svg';
+import blackMemorizeImg from '../assets/img/Black-Memorize.svg';
+import handGameImg from '../assets/img/Hand-Game.svg';
+import peaceGameImg from '../assets/img/Peace-Game.svg';
+import thumbsUpGameImg from '../assets/img/Thumbs-Up-Game.svg';
+import handGameOverImg from '../assets/img/Hand-Game-Over.svg';
+import peaceGameOverImg from '../assets/img/Peace-Game-Over.svg';
+import thumbsUpGameOverImg from '../assets/img/Thumbs-Up-Game-Over.svg';
+import circleEmpty from '../assets/img/Circle-Empty.svg';
+import circleGreen from '../assets/img/Circle-Green.svg';
+import circleRed from '../assets/img/Circle-Red.svg';
+import circleFilled from '../assets/img/Circle-Filled.svg';
+
+import correctSound from '../assets/sounds/correct.ogg';
+import wrongSound from '../assets/sounds/wrong.ogg';
+
+import loadingVideo from '../assets/vid/loading.mp4';
+document.querySelector('#loading-load source').setAttribute('src', loadingVideo);
+document.querySelector('#train-load source').setAttribute('src', loadingVideo);
+
+const modelJSON = new URL('/model/model.json', import.meta.url).href;
+const modelWeights = new URL('/model/model.weights.bin', import.meta.url).href;
+
 const $state = document.querySelector('#state');
 const $canvas = document.querySelector('#canvas');
 const $flatHand = document.querySelector('#flat-hand');
@@ -5,7 +31,6 @@ const $peace = document.querySelector('#peace');
 const $thumbsUp = document.querySelector('#thumbs-up');
 const $train = document.querySelector('#train');
 const $save = document.querySelector('#save');
-const $load = document.querySelector('#load');
 const $sampelingHome = document.querySelector('#sampling-home');
 
 const $training = document.querySelector('#training');
@@ -67,7 +92,7 @@ const setState = (value) => {
     document.documentElement.classList.add(state);
     //sets the timers
     document.querySelectorAll('.display-game, .cam__ontop').forEach(el => el.classList.add('hidden'));
-    if (value === STATE_GAME) { 
+    if (value === STATE_GAME) {
         document.querySelector('.display-game').classList.remove('hidden');
         timeToCheck = performance.now() + 3000;
         timeToShowMemorize = performance.now() + 2000;
@@ -135,29 +160,26 @@ const setup = async () => {
     // Set up the neural network
     let classifierOptions = {
         inputs: 42,
-        outputs: 3, 
+        outputs: 3,
         task: "classification",
         debug: true,
     };
+    
     classifier = ml5.neuralNetwork(classifierOptions);
-
-    classifier = ml5.neuralNetwork(classifierOptions);
-    const origin = new URL(window.location.href);
-    const pretrainedModelURL = new URL("./src/model/model.json", origin);
+    const pretrainedModelURL = modelJSON;
     // add event listeners to buttons
     $flatHand.addEventListener('click', () => sample('flat-hand'));
     $peace.addEventListener('click', () => sample('peace'));
     $thumbsUp.addEventListener('click', () => sample('thumbs-up'));
     $train.addEventListener('click', () => train());
     $save.addEventListener('click', () => classifier.save());
-    $load.addEventListener('click', () => classifier.load(pretrainedModelURL.toString(), () => {
-        setState(STATE_GAME);
-    }));
     $homeStart.addEventListener('click', () => {
-        classifier.load(pretrainedModelURL.toString(), () => {
+        classifier.load(pretrainedModelURL, () => {
+            classifier.normalizeData();
             setState(STATE_INFO);
         });
     });
+
     $create.addEventListener('click', () => {
         flatHandSamples = 0;
         thumbsUpSamples = 0;
@@ -196,8 +218,8 @@ const sample = (label) => {
     // the keypoints should be one big array of numbers
     const keypoints = getRelevantPositionKeyPoints(hands[0]).map(keypoint => [keypoint.x, keypoint.y]).flat();
     classifier.addData(keypoints, [label]);
-    
-    if (label == "peace"){
+
+    if (label == "peace") {
         peaceSamples++;
     } else if (label === "thumbs-up") {
         thumbsUpSamples++;
@@ -208,10 +230,10 @@ const sample = (label) => {
 
 const train = () => {
     const errorTag = document.querySelector(`.error-message`);
-    if(peaceSamples > 0 && flatHandSamples > 0 && thumbsUpSamples > 0){
+    if (peaceSamples > 0 && flatHandSamples > 0 && thumbsUpSamples > 0) {
         errorTag.textContent = "";
-
         setState(STATE_TRAINING);
+        
 
         setTimeout(() => {
             classifier.normalizeData();
@@ -222,7 +244,7 @@ const train = () => {
         if (peaceSamples === 0 && flatHandSamples === 0 && thumbsUpSamples === 0) {
             errorTag.textContent = "Every categorie needs at least 1 sample";
         } else {
-            if (peaceSamples === 0 && flatHandSamples === 0){
+            if (peaceSamples === 0 && flatHandSamples === 0) {
                 errorTag.textContent = "Peace and Flat Hand still need at least 1 sample";
             } else if (thumbsUpSamples === 0 && flatHandSamples === 0) {
                 errorTag.textContent = "Thumbs Up and Flat Hand still need at least 1 sample";
@@ -284,7 +306,7 @@ const progressBarDraw = () => {
 
     rightPattern.forEach(sign => {
         const $progressCircle = document.createElement(`img`);
-        $progressCircle.setAttribute(`src`, `./src/assets/img/Circle-Empty.svg`)
+        $progressCircle.setAttribute(`src`, circleEmpty)
         document.querySelector(`.progress-bar`).appendChild($progressCircle);
     });
 }
@@ -304,7 +326,7 @@ const addSign = () => {
 
     rightPattern.forEach(sign => {
         const $progressCircle = document.createElement(`img`);
-        $progressCircle.setAttribute(`src`, `./src/assets/img/Circle-Empty.svg`)
+        $progressCircle.setAttribute(`src`, circleEmpty)
         document.querySelector(`.progress-bar`).appendChild($progressCircle);
     });
 
@@ -312,27 +334,27 @@ const addSign = () => {
     gameStage = "memorizeStage";
     memorizeSign = -1;
     timeToShowMemorize = performance.now() + 2000;
-    document.querySelector(`.cam__image`).setAttribute(`src`, `./src/assets/img/Get-Ready-To-Memorize.svg`);
+    document.querySelector(`.cam__image`).setAttribute(`src`, getReadyImg);
     document.querySelector(`.game-bottom`).style.opacity = 0;
 };
 
 const showNextSign = () => {
     const $imgTag = document.querySelector(`.cam__image`);
     if (memorizeSign === -1) {
-        $imgTag.setAttribute(`src`, `./src/assets/img/Get-Ready-To-Memorize.svg`);
+        $imgTag.setAttribute(`src`, getReadyImg);
     } else if (rightPattern[memorizeSign] === "flat-hand") {
-        $imgTag.setAttribute(`src`, `./src/assets/img/Flat-Hand-Memorize.svg`);
+        $imgTag.setAttribute(`src`, flatHandMemorizeImg);
     } else if (rightPattern[memorizeSign] === "thumbs-up") {
-        $imgTag.setAttribute(`src`, `./src/assets/img/Thumbs-Up-Memorize.svg`);
+        $imgTag.setAttribute(`src`, thumbsUpMemorizeImg);
     } else if (rightPattern[memorizeSign] === "peace") {
-        $imgTag.setAttribute(`src`, `./src/assets/img/Peace-Memorize.svg`);
+        $imgTag.setAttribute(`src`, peaceMemorizeImg);
     }
 
     progressBarDraw();
 
     //looks for the what sign is getting showed to higlight it in the progress bar
     if (memorizeSign > -1 && !(memorizeSign + 1 > rightPattern.length)) {
-        document.querySelector(`.progress-bar img:nth-child(${memorizeSign + 1})`).setAttribute(`src`, `./src/assets/img/Circle-Filled.svg`)
+        document.querySelector(`.progress-bar img:nth-child(${memorizeSign + 1})`).setAttribute(`src`, circleFilled)
     }
 
     memorizeSign++;
@@ -353,7 +375,7 @@ const memorizeStage = () => {
     const diff = timeToShowMemorize - now;
     if (diff <= 0) {
         if (!(memorizeSign === rightPattern.length) && !(memorizeSign === -1)) {
-            document.querySelector(`.cam__image`).setAttribute(`src`, `./src/assets/img/Black-Memorize.svg`);
+            document.querySelector(`.cam__image`).setAttribute(`src`, blackMemorizeImg);
         }
         setTimeout(showNextSign, 100)
         timeToShowMemorize = now + 2000;
@@ -361,42 +383,57 @@ const memorizeStage = () => {
 };
 
 const setImageAndLabel = (checkedItem, nameTag, imageClass, path) => {
+    const imgMap = {
+        "thumbs-up": {
+            label: "Thumbs Up",
+            "-Game": thumbsUpGameImg,
+            "-Game-Over": thumbsUpGameOverImg,
+            default: thumbsUpMemorizeImg,
+        },
+        "flat-hand": {
+            label: "Flat Hand",
+            "-Game": handGameImg,
+            "-Game-Over": handGameOverImg,
+            default: flatHandMemorizeImg,
+        },
+        "peace": {
+            label: "Peace",
+            "-Game": peaceGameImg,
+            "-Game-Over": peaceGameOverImg,
+            default: peaceMemorizeImg,
+        },
+    };
 
-    if (checkedItem === "thumbs-up") {
-        nameTag.textContent = "Thumbs Up";
-        document.querySelector(imageClass).setAttribute(`src`, `./src/assets/img/Thumbs-Up${path}.svg`)
-    } else if (checkedItem === "flat-hand") {
-        nameTag.textContent = "Flat Hand";
-        document.querySelector(imageClass).setAttribute(`src`, `./src/assets/img/Hand${path}.svg`)
-    } else if (checkedItem === "peace") {
-        nameTag.textContent = "Peace";
-        document.querySelector(imageClass).setAttribute(`src`, `./src/assets/img/Peace${path}.svg`)
-    }
-}
+    const item = imgMap[checkedItem];
+    if (!item) return;
+
+    nameTag.textContent = item.label;
+    document.querySelector(imageClass).setAttribute("src", item[path] || item.default);
+};
 
 const drawGameOver = (wrongAnswer) => {
     setImageAndLabel(wrongAnswer, document.querySelector(`.wrong-sign__name`), ".wrong-sign__image", "-Game-Over");
-    
-    if (!(document.querySelector(`.game-over__bar`).firstChild === null)){
+
+    if (!(document.querySelector(`.game-over__bar`).firstChild === null)) {
         document.querySelector(`.game-over__bar`).textContent = "";
     }
 
-    for (let i = 0; i < rightPattern.length; i++){
+    for (let i = 0; i < rightPattern.length; i++) {
         const $progressCircle = document.createElement(`img`);
-        if(i === signOfRound){
-            $progressCircle.setAttribute(`src`, `./src/assets/img/Circle-Red.svg`);
-        } else if (i < signOfRound){
-            $progressCircle.setAttribute(`src`, `./src/assets/img/Circle-Green.svg`);
+        if (i === signOfRound) {
+            $progressCircle.setAttribute(`src`, circleRed);
+        } else if (i < signOfRound) {
+            $progressCircle.setAttribute(`src`, circleGreen);
         } else if (i > signOfRound) {
-            $progressCircle.setAttribute(`src`, `./src/assets/img/Circle-Empty.svg`);
+            $progressCircle.setAttribute(`src`, circleEmpty);
         }
         $progressCircle.setAttribute(`alt`, i);
         document.querySelector(`.game-over__bar`).appendChild($progressCircle);
     }
-    
+
     if (round - 1 === 0) {
         round = "00";
-    } else if(!(round - 1 > 9)){
+    } else if (!(round - 1 > 9)) {
         round = `0${round - 1}`;
     }
 
@@ -407,7 +444,7 @@ const drawGameOver = (wrongAnswer) => {
 
 const check = () => {
     if (classificationResults[0]?.label === rightPattern[signOfRound]) {
-        const correctAudio = new Audio("./src/assets/sounds/correct.ogg");
+        const correctAudio = new Audio(correctSound);
         correctAudio.play();
 
         signPattern.push(classificationResults[0]?.label);
@@ -415,10 +452,10 @@ const check = () => {
 
         document.querySelector(`.progress-bar`).removeChild(document.querySelector(`.progress-bar`).lastElementChild)
         const $progressCircle = document.createElement(`img`);
-        $progressCircle.setAttribute(`src`, `./src/assets/img/Circle-Green.svg`)
+        $progressCircle.setAttribute(`src`, circleGreen)
         document.querySelector(`.progress-bar`).insertBefore($progressCircle, document.querySelector(`.progress-bar`).firstChild);
     } else {
-        const wrongAudio = new Audio("./src/assets/sounds/wrong.ogg");
+        const wrongAudio = new Audio(wrongSound);
         wrongAudio.play();
 
         setState(STATE_GAME_OVER);
@@ -428,7 +465,7 @@ const check = () => {
 
 const guessStage = () => {
     //highlights the sign that needs to be guessed in the progress bar
-    document.querySelector(`.progress-bar img:nth-child(${signOfRound + 1})`).setAttribute(`src`, `./src/assets/img/Circle-Filled.svg`)
+    document.querySelector(`.progress-bar img:nth-child(${signOfRound + 1})`).setAttribute(`src`, circleFilled)
 
     const now = performance.now();
     const diff = timeToCheck - now;
