@@ -237,6 +237,25 @@ const train = () => {
 
         setTimeout(() => {
             classifier.normalizeData();
+            try {
+
+                const tfModel = classifier?.model || classifier?.net || null;
+
+                if (tfModel && typeof tfModel.compile === 'function') {
+
+                    if (!tfModel.optimizer) {
+                        tfModel.compile({
+                            optimizer: 'adam',
+                            loss: 'categoricalCrossentropy',
+                            metrics: ['accuracy'],
+                        });
+                        console.info('Compiled tf model for training.');
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not auto-compile tf model:', e);
+            }
+
             const options = { epochs: 150 };
             classifier.train(options, whileTraining, finishedTraining);
         }, 50);
